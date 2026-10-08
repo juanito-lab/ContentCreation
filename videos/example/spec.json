@@ -1,0 +1,18 @@
+{
+  "scenes": [
+    { "name": "Hook", "dur": 3, "words": [
+      { "t": 0.2, "text": "your truck", "font": "sansLight", "size": 90, "x": 50, "y": 30 },
+      { "t": 0.7, "text": "can't hear", "font": "sans", "size": 170, "x": 50, "y": 40 },
+      { "t": 1.4, "text": "itself", "font": "script", "size": 380, "x": 50, "y": 55, "color": "#e1251b" } ] },
+    { "name": "Number", "dur": 3.5, "words": [
+      { "t": 0.1, "text": "one breakdown costs", "font": "sansLight", "size": 80, "x": 50, "y": 32 },
+      { "t": 2.2, "text": "per day", "font": "serifItalic", "size": 130, "x": 50, "y": 64, "color": "#0a8f50" } ],
+      "counter": { "t": 0.5, "to": 760, "prefix": "$", "y": 48 } },
+    { "name": "Payoff", "dur": 4, "climax": true, "words": [
+      { "t": 0.1, "text": "we listen", "font": "sans", "size": 170, "x": 50, "y": 38 },
+      { "t": 1.0, "text": "4 weeks earlier", "font": "serifItalic", "size": 120, "x": 50, "y": 52, "color": "#e1251b" },
+      { "t": 2.2, "text": "@juansimon.builds", "font": "sansLight", "size": 64, "x": 50, "y": 80 } ] }
+  ],
+  "covers": [60],
+  "post": { "caption": "Your truck can't hear itself. We built the thing that can.", "hashtags": ["buildinpublic", "startup", "trucking"] }
+}

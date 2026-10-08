@@ -1,0 +1,15 @@
+# personal media never goes in this public repo
+studio/public/mix/
+studio/public/v/
+studio/public/vo/
+videos/*/media/
+videos/*/out/
+videos/*/*.wav
+videos/*/*.webm
+videos/*/*.mp4
+refs/
+# build stuff
+studio/node_modules/
+studio/out/
+studio/build/
+.DS_Store
