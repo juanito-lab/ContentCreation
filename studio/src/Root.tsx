@@ -10,7 +10,7 @@ import type { MixProps } from "./FounderMix";
 export const RemotionRoot: React.FC = () => (
   <>
     {/* Jasper x Santi mix with Juan's real footage. */}
-    <Composition id="FounderMix" component={FounderMix} durationInFrames={970} fps={30} width={1080} height={1920} schema={mixSchema} defaultProps={mixDefaults as MixProps} calculateMetadata={calculateMixMetadata} />
+    <Composition id="FounderMix" component={FounderMix} durationInFrames={1052} fps={30} width={1080} height={1920} schema={mixSchema} defaultProps={mixDefaults as MixProps} calculateMetadata={calculateMixMetadata} />
     {/* MantAI founder intro (structure of the Jasper/ATHLAITE reel). */}
     <Composition id="FounderIntro" component={FounderIntro} durationInFrames={660} fps={30} width={1080} height={1920} schema={founderSchema} defaultProps={founderDefaults as FounderProps} calculateMetadata={calculateFounderMetadata} />
     {/* Short: one JSON spec = one video. Used by make.sh / Hermes. */}

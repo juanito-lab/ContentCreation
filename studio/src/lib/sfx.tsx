@@ -65,34 +65,57 @@ export const SOUNDS = {
   cardPlace1: { file: "sfx/cardPlace1.wav", len: 767, lead: 170, loud: -21.7 },
   clink1: { file: "sfx/clink1.wav", len: 384, lead: 0, loud: -11.9 },
   swishSmall: { file: "sfx/swishSmall.wav", len: 298, lead: 74, loud: -11.9 },
-  // Airplane pass (real recording, CC0, Joseph Sardin / BigSoundBank #3006 "Airplane, pass #3"), 4.2 s cut around the closest point
-  airplanePass: { file: "sfx/airplanePass.wav", len: 4200, lead: 2450, loud: -17.8 },
-  // Neu (v5, CC0): Flug, Papier, Seil-Whoosh, Karte, Stift, Applaus, Nikon-Auslöser
-  airplane_pass1_flyby: { file: "sfx/airplane_pass1_flyby.wav", len: 2968, lead: 1965, loud: -18.8 },
+  // Neu (v5, CC0): Papier, Seil-Whoosh, Karte, Stift, Nikon-Auslöser
   page_turn_single: { file: "sfx/page_turn_single.wav", len: 518, lead: 175, loud: -20.0 },
   pages_flip_multi: { file: "sfx/pages_flip_multi.wav", len: 2352, lead: 721, loud: -17.8 },
   whoosh_rope: { file: "sfx/whoosh_rope.wav", len: 550, lead: 200, loud: -11.1 },
   road_map_unfold: { file: "sfx/road_map_unfold.wav", len: 1418, lead: 925, loud: -19.0 },
   pen_click: { file: "sfx/pen_click.wav", len: 254, lead: 139, loud: -27.6 },
-  crowd_yeah_applause: { file: "sfx/crowd_yeah_applause.wav", len: 3342, lead: 265, loud: -13.3 },
   camera_shutter_nikon: { file: "sfx/camera_shutter_nikon.wav", len: 310, lead: 180, loud: -16.1 },
+  // v6: "Whoosh Passenger Plane" by SoundReality (Pixabay Content License), 3.20 s, peak (closest point) at 1837 ms, peak -3 dBFS
+  plane_whoosh: { file: "sfx/plane_whoosh.wav", len: 3200, lead: 1837, loud: -12.3 },
 } as const;
 export type SoundName = keyof typeof SOUNDS;
 
-/** at = Frame im Video, auf dem der Sound sitzt; vol = Lautstärke 0–1; name erscheint in der Studio-Zeitleiste. */
-export type Cue = { at: number; s: SoundName; vol: number; name: string };
+/** at = Frame im Video, auf dem der Sound sitzt (die Stelle `lead` der Datei); vol = Lautstärke 0–1; name erscheint in der Studio-Zeitleiste.
+ *  until = Frame, auf dem der Sound endet (wenn die Animation endet): die letzten 2 Frames (~66 ms) blenden aus.
+ *  skip = ms vom Dateianfang, die weggelassen werden (der Sound startet dann mitten im Anlauf, 3 Frames Einblendung), `at` bleibt die Stelle `lead`. */
+export type Cue = { at: number; s: SoundName; vol: number; name: string; until?: number; skip?: number };
 
 /** Millisekunden → Frames (30 fps), wie f() in Demo.tsx. */
 const fr = (ms: number) => Math.round(ms * 0.03);
+
+/** Start-/Endframe einer Cue im Video (für SfxTrack und die Cue-Tabelle). */
+export const cueSpan = (c: Cue) => {
+  const S = SOUNDS[c.s];
+  const skipF = c.skip ? fr(c.skip) : 0;
+  let from = c.at - fr(S.lead) + skipF;
+  let trim = skipF;
+  if (from < 0) {
+    trim += -from;
+    from = 0;
+  }
+  const natural = from + Math.ceil(S.len * 0.03) + 2 - trim;
+  const end = c.until !== undefined ? Math.min(c.until, natural) : natural;
+  return { from, trim, end: Math.max(from + 1, end), cut: c.until !== undefined && c.until < natural };
+};
 
 /** Spielt jede Cue als eigene, benannte Sequenz ab. volume = Regler für alle zusammen. */
 export const SfxTrack: React.FC<{ cues: Cue[]; volume?: number }> = ({ cues, volume = 1 }) => (
   <>
     {cues.map((c, i) => {
       const S = SOUNDS[c.s];
+      const { from, trim, end, cut } = cueSpan(c);
+      const dur = end - from;
+      const gain = (f: number) => {
+        let g = 1;
+        if (cut) g = Math.min(g, Math.max(0, (dur - 1 - f) / 2)); // 2-frame fade-out, silent on the last frame
+        if (trim > 0 && c.skip) g = Math.min(g, (f + 1) / 3); // 3-frame fade-in when starting mid-file
+        return c.vol * volume * g;
+      };
       return (
-        <Sequence key={i} from={Math.max(0, c.at - fr(S.lead))} durationInFrames={Math.ceil(S.len * 0.03) + 2} layout="none" name={`SFX · ${c.name}`}>
-          <Audio src={staticFile(S.file)} volume={c.vol * volume} />
+        <Sequence key={i} from={from} durationInFrames={dur} layout="none" name={`SFX · ${c.name}`}>
+          <Audio src={staticFile(S.file)} trimBefore={trim || undefined} volume={cut || (trim > 0 && c.skip) ? gain : c.vol * volume} />
         </Sequence>
       );
     })}

@@ -95,8 +95,8 @@ export const shortSchema = z.object({
   sfxVolume: z.number().min(0).max(2).default(1.3),
   autoSfx: z.boolean().default(true),
   theme: z
-    .object({ bg: z.string().default("#ffffff"), ink: z.string().default("#000000"), accent: z.string().default("#e1251b"), accent2: z.string().default("#12b76a") })
-    .default({ bg: "#ffffff", ink: "#000000", accent: "#e1251b", accent2: "#12b76a" }),
+    .object({ bg: z.string().default("#ffffff"), ink: z.string().default("#000000"), accent: z.string().default("#E10600"), accent2: z.string().default("#12b76a") })
+    .default({ bg: "#ffffff", ink: "#000000", accent: "#E10600", accent2: "#12b76a" }),
   scenes: z.array(sceneSpec).min(1),
 });
 export type ShortProps = z.input<typeof shortSchema>;
@@ -308,7 +308,7 @@ const shortDefaultsInput: ShortProps = {
       words: [
         { t: 0.2, text: "your truck", font: "sansLight", size: 90, x: 50, y: 30 },
         { t: 0.7, text: "can't hear", font: "sans", size: 170, x: 50, y: 40 },
-        { t: 1.4, text: "itself", font: "script", size: 380, x: 50, y: 55, color: "#e1251b" },
+        { t: 1.4, text: "itself", font: "script", size: 380, x: 50, y: 55, color: "#E10600" },
       ],
     },
     {
@@ -326,7 +326,7 @@ const shortDefaultsInput: ShortProps = {
       climax: true,
       words: [
         { t: 0.1, text: "we listen", font: "sans", size: 170, x: 50, y: 38 },
-        { t: 1.0, text: "4 weeks earlier", font: "serifItalic", size: 120, x: 50, y: 52, color: "#e1251b" },
+        { t: 1.0, text: "4 weeks earlier", font: "serifItalic", size: 120, x: 50, y: 52, color: "#E10600" },
         { t: 2.2, text: "@juansimon.builds", font: "sansLight", size: 64, x: 50, y: 80 },
       ],
     },

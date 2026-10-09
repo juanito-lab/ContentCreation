@@ -23,7 +23,7 @@ import type { Cue, SoundName } from "./lib/sfx";
 
 const FPS = 30;
 const fr = (s: number) => Math.round(s * FPS);
-const RED = "#e1251b";
+const RED = "#E10600";
 const GREEN = "#12b76a";
 const INK = "#0b0b0c";
 
@@ -120,7 +120,8 @@ export const Card: React.FC<{ file: string; label: string; left: number; top: nu
   glow = 1,
 }) => {
   const frame = useCurrentFrame();
-  const { s, visible, opacity } = usePop(delay);
+  const { s, visible } = usePop(delay);
+  const opacity = 1;
   if (!visible) return null;
   const z = interpolate(frame - delay, [0, 90], [1, zoom], { extrapolateRight: "clamp" });
   return (
@@ -173,17 +174,16 @@ export const Sub: React.FC<{ text: string; at: number; until?: number }> = ({ te
 
 /** Hand-drawn underline: two strokes that draw themselves (strokeDashoffset) over ~8 frames starting at `at` (frames in the
  *  enclosing Sequence). x1/x2/y in px on the 1080x1920 canvas. */
-export const Swoosh: React.FC<{ at: number; x1: number; x2: number; y: number; color?: string; width?: number; dur?: number; shadow?: boolean }> = ({ at, x1, x2, y, color = RED, width = 15, dur = 8, shadow = false }) => {
+export const Swoosh: React.FC<{ at: number; x1: number; x2: number; y: number; color?: string; width?: number; dur?: number; shadow?: boolean }> = ({ at, x1, x2, y, color = RED, width = 15, shadow = false }) => {
   const frame = useCurrentFrame();
   if (frame < at) return null;
   const w = x2 - x1;
-  const a = interpolate(frame, [at, at + dur], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) });
-  const b = interpolate(frame, [at + 4, at + 4 + dur - 2], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) });
-  const pen = { fill: "none", stroke: color, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, pathLength: 1, strokeDasharray: 1 };
+  // v7: static, fully drawn on the frame it appears
+  const pen = { fill: "none", stroke: color, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
   return (
     <svg viewBox="0 0 1080 1920" style={{ position: "absolute", inset: 0, pointerEvents: "none", filter: shadow ? "drop-shadow(0 3px 8px rgba(0,0,0,0.5))" : undefined }}>
-      <path d={`M ${x1} ${y + 6} C ${x1 + w * 0.3} ${y - 16}, ${x1 + w * 0.65} ${y + 14}, ${x2} ${y - 10}`} {...pen} strokeWidth={width} strokeDashoffset={1 - a} />
-      {b > 0 ? <path d={`M ${x1 + w * 0.14} ${y + 34} C ${x1 + w * 0.4} ${y + 16}, ${x1 + w * 0.68} ${y + 38}, ${x2 - w * 0.1} ${y + 20}`} {...pen} strokeWidth={width * 0.62} strokeDashoffset={1 - b} /> : null}
+      <path d={`M ${x1} ${y + 6} C ${x1 + w * 0.3} ${y - 16}, ${x1 + w * 0.65} ${y + 14}, ${x2} ${y - 10}`} {...pen} strokeWidth={width} />
+      <path d={`M ${x1 + w * 0.14} ${y + 34} C ${x1 + w * 0.4} ${y + 16}, ${x1 + w * 0.68} ${y + 38}, ${x2 - w * 0.1} ${y + 20}`} {...pen} strokeWidth={width * 0.62} />
     </svg>
   );
 };
@@ -378,26 +378,32 @@ const TILES = [
 ] as const;
 const WALL_LABELS = ["dorm", "first MSU", "soldering", "Stanford", "pilot truck", "dashboard", "whiteboard", "3D print", "late night", "Santi coding", "install", "airport", "demo day", "sensor close-up", "team dinner", "road test", "pitch"];
 const WALL_STEP = 2;
-export const B6: React.FC<{ p: P; brand?: number; swoosh?: boolean }> = ({ p, brand = 1.05, swoosh = false }) => {
+export const B6: React.FC<{ p: P; brand?: number; swoosh?: boolean; bg?: string; tile0?: number }> = ({ p, brand = 1.05, swoosh = false, bg = "#fff", tile0 = 6 }) => {
   const frame = useCurrentFrame();
   const brandAt = fr(brand);
   // camera shake on the climax drum frame: decays over ~10 frames
   const sk = frame >= brandAt ? Math.max(0, 1 - (frame - brandAt) / 10) : 0;
   const shake = `translate(${Math.sin(frame * 3.3) * 16 * sk}px, ${Math.cos(frame * 4.1) * 12 * sk}px) rotate(${Math.sin(frame * 2.7) * 0.9 * sk}deg) scale(${1 + 0.025 * sk})`;
   const veil = interpolate(frame, [brandAt - 2, brandAt + 6], [0, 0.55], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const bs = spring({ frame: Math.max(0, frame - brandAt), fps: FPS, config: { damping: 12, stiffness: 190 } });
   return (
-    <AbsoluteFill style={{ background: "#fff" }}>
+    <AbsoluteFill style={{ background: bg }}>
       <AbsoluteFill style={{ transform: shake }}>
       {TILES.map(([l, t, w, a, r], i) => (
-        <Card key={i} file={p.wall[i] ?? ""} label={WALL_LABELS[i % WALL_LABELS.length]} left={l} top={t} width={w} aspect={1 / a} delay={6 + i * WALL_STEP} zoom={1} hue={(i * 47) % 360} rotate={r} radius={14} glow={0.45} />
+        <Card key={i} file={p.wall[i] ?? ""} label={WALL_LABELS[i % WALL_LABELS.length]} left={l} top={t} width={w} aspect={1 / a} delay={tile0 + i * WALL_STEP} zoom={1} hue={(i * 47) % 360} rotate={r} radius={14} glow={0.45} />
       ))}
+      </AbsoluteFill>
       <AbsoluteFill style={{ background: `rgba(255,255,255,${veil})` }} />
+      {/* v7: text lives outside the shaking layer, pixel-still */}
       <Words
         color={INK}
+        // v16: white halo (same recipe as NameTag's "Santiago") — before the climax veil ramps in, this text sits directly
+        // on the raw, unblurred photo tiles (some dark, some busy/high-contrast) with nothing behind it; the halo keeps
+        // both "together" and "we're building" readable no matter which tile happens to be underneath at a given frame.
+        shadow="0 0 18px #fff, 0 0 8px #fff, 0 0 3px #fff"
         words={words([
-          { t: 0.05, text: "together", font: "script", size: 185, x: 29, y: 10.5, weight: 700, color: RED },
-          { t: 0.45, text: "we're building", font: "elegant", size: 100, x: 71, y: 15.5 },
+          // v14: +7.1 (was 10.5/15.5) — "together" top edge sat well above the 220px safe line (Juan's reference).
+          { t: 0.05, text: "together", font: "script", size: 185, x: 29, y: 17.6, weight: 700, color: RED },
+          { t: 0.45, text: "we're building", font: "elegant", size: 100, x: 71, y: 22.6 },
         ])}
       />
       {frame >= brandAt ? (
@@ -413,16 +419,14 @@ export const B6: React.FC<{ p: P; brand?: number; swoosh?: boolean }> = ({ p, br
             ...FONTS.sans,
             fontWeight: 900,
             letterSpacing: "-0.03em",
-            transform: `translateY(-50%) scale(${interpolate(bs, [0, 1], [1.25, 1])})`,
-            opacity: interpolate(frame - brandAt, [0, 3], [0, 1], { extrapolateRight: "clamp" }),
+            transform: "translateY(-50%)",
             textShadow: "0 0 40px #fff",
           }}
         >
           MANT<span style={{ color: RED }}>AI</span>
         </div>
       ) : null}
-      {swoosh ? <Swoosh at={brandAt + 3} x1={150} x2={880} y={1000} /> : null}
-      </AbsoluteFill>
+      {swoosh ? <Swoosh at={brandAt} x1={150} x2={880} y={1000} /> : null}
     </AbsoluteFill>
   );
 };
@@ -442,7 +446,7 @@ const B7: React.FC<{ p: P }> = ({ p }) => {
         words={words([
           { t: 0.05, text: "one breakdown", font: "sans", size: 132, x: 50, y: 13 },
           { t: 0.5, text: "costs", font: "sansLight", size: 90, x: 50, y: 21 },
-          { t: 2.0, text: "per day", font: "serifItalic", size: 120, x: 50, y: 40, color: "#0a8f50" },
+          { t: 2.0, text: "per day", font: "serifItalic", size: 120, x: 50, y: 40, color: RED },
         ])}
       />
       {frame >= at ? (
@@ -457,7 +461,7 @@ const B7: React.FC<{ p: P }> = ({ p }) => {
             alignItems: "center",
             gap: 20,
             transform: `translateY(-50%) scale(${interpolate(cs, [0, 1], [0.8, 1])})`,
-            color: GREEN,
+            color: RED,
             fontSize: 230,
             ...FONTS.sans,
             fontWeight: 900,
@@ -498,7 +502,7 @@ export const B8: React.FC<{ p: P }> = ({ p }) => {
         ])}
       />
       <div style={{ position: "absolute", left: "7%", width: "86%", top: "28%", height: "34%", background: "#fff", borderRadius: 34, boxShadow: "0 12px 40px rgba(0,0,0,0.10)", overflow: "hidden" }}>
-        <div style={{ position: "absolute", left: 40, top: 34, fontSize: 34, color: "#6b7280", letterSpacing: "0.12em", ...FONTS.sansLight }}>MSU · TRUCK 07 · ACOUSTIC</div>
+        <div style={{ position: "absolute", left: 40, top: 34, fontSize: 34, color: INK, opacity: 0.6, letterSpacing: "0.12em", ...FONTS.sansLight }}>MSU · TRUCK 07 · ACOUSTIC</div>
         <div style={{ position: "absolute", right: 40, top: 30, width: 18, height: 18, borderRadius: 9, marginTop: 10, background: frame >= alertAt ? RED : GREEN }} />
         <div style={{ position: "absolute", left: 40, right: 40, top: 110, bottom: 50, display: "flex", alignItems: "center", gap: 6 }}>
           {Array.from({ length: N }, (_, i) => {
@@ -526,9 +530,9 @@ export const B8: React.FC<{ p: P }> = ({ p }) => {
             boxShadow: "0 18px 50px rgba(0,0,0,0.3)",
           }}
         >
-          <div style={{ fontSize: 34, color: "#fca5a5", letterSpacing: "0.1em", ...FONTS.sansLight }}>⚠ WEAR DETECTED</div>
+          <div style={{ fontSize: 34, color: "#fff", letterSpacing: "0.1em", ...FONTS.sansLight }}>⚠ WEAR DETECTED</div>
           <div style={{ fontSize: 60, marginTop: 10, ...FONTS.sans, letterSpacing: "-0.03em" }}>{p.alertPart}</div>
-          <div style={{ fontSize: 46, marginTop: 6, color: "#86efac", ...FONTS.serifItalic }}>{p.alertLead}</div>
+          <div style={{ fontSize: 46, marginTop: 6, color: "#fff", ...FONTS.serifItalic }}>{p.alertLead}</div>
         </div>
       ) : null}
     </AbsoluteFill>
@@ -541,22 +545,24 @@ const SX = 905,
   EX = 760,
   EY = 0.27 * 1920 + 150;
 const SQ = `M ${SX} ${SY} C ${SX + 80} ${SY + 10} ${SX + 110} ${SY + 70} ${SX + 70} ${SY + 115} C ${SX + 40} ${SY + 150} ${SX - 20} ${SY + 130} ${SX - 5} ${SY + 95} C ${SX + 10} ${SY + 60} ${SX + 80} ${SY + 90} ${SX + 60} ${SY + 150} C ${SX + 40} ${SY + 210} ${EX + 120} ${EY} ${EX} ${EY}`;
-export const B9: React.FC<{ p: P; frames: number; line2?: number; last?: number }> = ({ p, frames, line2 = 0.95, last = 1.5 }) => {
+export const B9: React.FC<{ p: P; frames: number; line2?: number; last?: number; bg?: string; noFade?: boolean; card?: React.ReactNode }> = ({ p, frames, line2 = 0.95, last = 1.5, bg = "#fff", noFade = false, card }) => {
   const frame = useCurrentFrame();
   const drawAt = fr(0.45);
-  const line = interpolate(frame, [drawAt, drawAt + 12], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.cubic) });
-  const head = interpolate(frame, [drawAt + 12, drawAt + 15], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const fade = interpolate(frame, [frames - 8, frames], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const line = frame >= drawAt ? 1 : 0; // v7: static, fully drawn when it appears
+  const head = line;
+  const fade = noFade ? 1 : interpolate(frame, [frames - 8, frames], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const pen = { fill: "none", stroke: RED, strokeWidth: 9, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, pathLength: 1, strokeDasharray: 1 };
   return (
-    <AbsoluteFill style={{ background: "#fff" }}>
+    <AbsoluteFill style={{ background: bg }}>
       <AbsoluteFill style={{ opacity: fade }}>
-        <Card file={p.juan2} label={"photo: you, landscape,\narms open"} left={8} top={27} width={76} aspect={16 / 10} delay={0} zoom={1.1} />
+        {card ?? <Card file={p.juan2} label={"photo: you, landscape,\narms open"} left={8} top={27} width={76} aspect={16 / 10} delay={0} zoom={1.1} />}
         <Words
           color={INK}
           words={words([
-            { t: 0.05, text: "I'm", font: "script", size: 175, x: 14, y: 12.5, color: RED, weight: 700 },
-            { t: 0.15, text: "Juan", font: "sans", size: 290, x: 50, y: 16 },
+            // v16: moved closer to "Juan" both ways (was x:12/y:15.6) — Juan flagged the two reading as disconnected;
+            // still clear of the 220px top safe line (top edge ~298px).
+            { t: 0.05, text: "I'm", font: "elegant", size: 130, x: 20, y: 18.9 },
+            { t: 0.05, text: "Juan", font: "sans", size: 270, x: 52, y: 23.6 },
             { t: line2, text: "this is only the", font: "sansLight", size: 96, x: 40, y: 59 },
             { t: last, text: "beginning", font: "script", size: 222, x: 42, y: 66.5, weight: 700, color: RED },
           ])}

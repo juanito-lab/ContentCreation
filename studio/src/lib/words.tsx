@@ -1,14 +1,14 @@
 // Wort-DSL: jedes Wort hat Schrift, Größe, Position (% der Fläche) und einen Einsatz-Frame.
-// Wörter poppen ein (Spring 0.7 → 1, Opacity in 3 Frames) und bleiben stehen.
+// v7: Wörter erscheinen hart auf einem Frame und stehen still (keine Animation).
 import React from "react";
-import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { z } from "zod";
 import { FONTS, FontKey } from "./fonts";
 
 export const wordSchema = z.object({
   text: z.string(),
   at: z.number().int().nonnegative(),
-  font: z.enum(["sans", "sansLight", "serifItalic", "script", "hand", "brush", "elegant"]).default("sans"),
+  font: z.enum(["sans", "serif", "script", "sansLight", "serifItalic", "hand", "brush", "elegant"]).default("sans"),
   size: z.number().positive(),
   x: z.number(),
   y: z.number(),
@@ -16,25 +16,20 @@ export const wordSchema = z.object({
   color: z.string().optional(),
   until: z.number().int().optional(),
   rotate: z.number().optional(),
+  /** v8: per-word override of the beat's shared shadow (e.g. a heavier stack for a caption over a busy backdrop). */
+  shadow: z.string().optional(),
+  /** v8: faux-bold via -webkit-text-stroke (thickens the glyph with the same ink as the fill) — used instead of a
+   *  heavier font weight, since only Inter Tight 700 is loaded. e.g. "3px #fff" for a bolder white caption. */
+  stroke: z.string().optional(),
+  /** v8: per-word letter-spacing override (CSS value, e.g. "-0.08em") — reclaims width for a long phrase set bigger. */
+  tracking: z.string().optional(),
 });
 export type Word = z.infer<typeof wordSchema>;
 
-export const useWordPop = (at: number, until?: number) => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const t = frame - at;
-  if (t < 0 || (until !== undefined && frame >= until)) return { opacity: 0, scale: 0.7, rot: 0, visible: false };
-  const s = spring({ frame: t, fps, config: { damping: 10, stiffness: 190, mass: 0.8 } });
-  const scale = interpolate(s, [0, 1], [0.62, 1]);
-  const opacity = interpolate(t, [0, 3], [0, 1], { extrapolateRight: "clamp" });
-  // kinetic touch: the word tips in from a few degrees and overshoots past upright before settling (alternating direction)
-  const rot = interpolate(s, [0, 1], [(at % 2 ? 1 : -1) * 7, 0]);
-  return { opacity, scale, rot, visible: true };
-};
-
+/** v7: text is static. A word appears on its frame (hard cut, no pop/tilt/fade) and stays pixel-still until `until` (also a hard cut). */
 const WordItem: React.FC<{ w: Word; color: string; shadow?: string }> = ({ w, color, shadow }) => {
-  const { opacity, scale, rot, visible } = useWordPop(w.at, w.until);
-  if (!visible) return null;
+  const frame = useCurrentFrame();
+  if (frame < w.at || (w.until !== undefined && frame >= w.until)) return null;
   const font = FONTS[w.font as FontKey];
   return (
     <div
@@ -42,16 +37,16 @@ const WordItem: React.FC<{ w: Word; color: string; shadow?: string }> = ({ w, co
         position: "absolute",
         left: `${w.x}%`,
         top: `${w.y}%`,
-        transform: `translate(-50%, -50%) scale(${scale}) rotate(${(w.rotate ?? 0) + rot}deg)`,
-        transformOrigin: "center",
-        opacity,
+        transform: `translate(-50%, -50%)${w.rotate ? ` rotate(${w.rotate}deg)` : ""}`,
         color: w.color ?? color,
-        fontSize: w.size,
+        fontSize: font.fontFamily === "Great Vibes" ? w.size * 1.12 : w.size, // Great Vibes sets small for its size
         lineHeight: 1,
         whiteSpace: "nowrap",
-        textShadow: shadow,
+        textShadow: w.shadow ?? shadow,
         ...font,
-        ...(w.weight ? { fontWeight: w.weight } : null),
+        ...(w.weight && font.fontFamily === "Inter Tight" ? { fontWeight: w.weight } : null),
+        ...(w.stroke ? { WebkitTextStroke: w.stroke } : null),
+        ...(w.tracking ? { letterSpacing: w.tracking } : null),
       }}
     >
       {w.text}

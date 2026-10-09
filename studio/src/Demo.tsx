@@ -126,7 +126,7 @@ const TEXT_LEAD_MS = 100;
 /** Wörter mit Einsatzzeit in ms im Voiceover (absolut) → relative Frames der Szene. */
 const rel = (sceneIdx: number, ws: (Omit<Word, "at"> & { ms: number })[]): Word[] => ws.map(({ ms, ...w }) => ({ ...w, at: f(ms - TEXT_LEAD_MS) - start(sceneIdx) }));
 
-const RED = "#e1251b";
+const RED = "#E10600";
 const GREEN = "#12b76a";
 const GREEN_DARK = "#0a8f50";
 
