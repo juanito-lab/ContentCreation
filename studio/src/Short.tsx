@@ -1,10 +1,11 @@
 // Short: a vertical video (1080x1920, 30 fps) built entirely from a JSON spec.
-// An agent writes videos/<id>/spec.json, make.sh renders it. No code changes per video.
+// You (or an agent) write videos/<id>/spec.json, tools/make.sh renders it. No code changes per video.
+// Every field is documented in docs/spec-reference.md.
 //
 // Spec = list of scenes. Each scene: duration, optional media (clip or image, as inset card or full-bleed),
-// words that pop in at given times, optional counting number. Sound design is added automatically
+// words that appear at given times, optional counting number. Sound design is added automatically
 // from the same timings (keys on words, pencil on script words, shutter on media, page/drum on cuts,
-// flaps on counters, riser into the climax), using only the real recorded SFX from the kit.
+// flaps on counters, riser into the climax), using only the real recorded SFX in public/sfx.
 import React from "react";
 import { AbsoluteFill, Audio, Img, interpolate, OffthreadVideo, Sequence, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import type { CalculateMetadataFunction } from "remotion";
@@ -13,16 +14,20 @@ import { FONTS } from "./lib/fonts";
 import { Words, WHITE_SHADOW } from "./lib/words";
 import type { Word } from "./lib/words";
 import { SfxTrack, SOUNDS } from "./lib/sfx";
+import { SafeZones } from "./lib/safezones";
 import type { Cue, SoundName } from "./lib/sfx";
 
 export const FPS = 30;
 const fr = (sec: number) => Math.round(sec * FPS);
 
-const fontEnum = z.enum(["sans", "sansLight", "serifItalic", "script"]);
+/** sans = Inter Tight (bold), serif = Libre Caslon Display, script = Great Vibes. sansLight / serifItalic are older names for serif. */
+const fontEnum = z.enum(["sans", "serif", "script", "sansLight", "serifItalic"]);
 
 const wordSpec = z.object({
-  /** seconds from scene start (pop-in happens 0.1 s earlier so the word is fully there when spoken) */
+  /** seconds from scene start (the word appears 0.1 s earlier so it is there when it is spoken) */
   t: z.number().min(0),
+  /** seconds from scene start when the word disappears; 0 = stays until the end of the scene */
+  until: z.number().min(0).default(0),
   text: z.string(),
   font: fontEnum.default("sans"),
   size: z.number().positive().default(120),
@@ -34,6 +39,8 @@ const wordSpec = z.object({
   /** 0 = font default */
   weight: z.number().default(0),
   rotate: z.number().default(0),
+  /** faux-bold outline in the text colour, e.g. "3px #ffffff"; "" = none */
+  stroke: z.string().default(""),
 });
 
 const mediaSpec = z.object({
@@ -98,6 +105,8 @@ export const shortSchema = z.object({
     .object({ bg: z.string().default("#ffffff"), ink: z.string().default("#000000"), accent: z.string().default("#E10600"), accent2: z.string().default("#12b76a") })
     .default({ bg: "#ffffff", ink: "#000000", accent: "#E10600", accent2: "#12b76a" }),
   scenes: z.array(sceneSpec).min(1),
+  /** preview only: draw the areas TikTok / Reels cover with their UI (red). make.sh --preview turns this on. */
+  safeZones: z.boolean().default(false),
 });
 export type ShortProps = z.input<typeof shortSchema>;
 type Spec = z.output<typeof shortSchema>;
@@ -210,6 +219,7 @@ const SceneView: React.FC<{ s: Scene; spec: Spec; frames: number }> = ({ s, spec
   const words: Word[] = s.words.map((w) => ({
     text: w.text,
     at: Math.max(0, fr(w.t - TEXT_LEAD)),
+    until: w.until > w.t ? fr(w.until) : undefined,
     font: w.font,
     size: w.size,
     x: w.x,
@@ -217,6 +227,7 @@ const SceneView: React.FC<{ s: Scene; spec: Spec; frames: number }> = ({ s, spec
     color: w.color || undefined,
     weight: w.weight || undefined,
     rotate: w.rotate || undefined,
+    stroke: w.stroke || undefined,
   }));
   return (
     <AbsoluteFill style={{ background: s.bg || spec.theme.bg }}>
@@ -295,11 +306,12 @@ export const Short: React.FC<ShortProps> = (props) => {
           <SceneView s={s} spec={spec} frames={fr(s.dur)} />
         </Sequence>
       ))}
+      {spec.safeZones ? <SafeZones /> : null}
     </AbsoluteFill>
   );
 };
 
-/** Default spec shown in Studio: a MantAI-style 12 s example with placeholders only (no media needed). */
+/** Default spec shown in Studio: a 10.5 s text-only example (no media needed). Same as videos/example/spec.json. */
 const shortDefaultsInput: ShortProps = {
   scenes: [
     {
@@ -327,7 +339,7 @@ const shortDefaultsInput: ShortProps = {
       words: [
         { t: 0.1, text: "we listen", font: "sans", size: 170, x: 50, y: 38 },
         { t: 1.0, text: "4 weeks earlier", font: "serifItalic", size: 120, x: 50, y: 52, color: "#E10600" },
-        { t: 2.2, text: "@juansimon.builds", font: "sansLight", size: 64, x: 50, y: 80 },
+        { t: 2.2, text: "@yourhandle", font: "sansLight", size: 64, x: 50, y: 68 },
       ],
     },
   ],

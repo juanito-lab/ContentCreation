@@ -19,12 +19,13 @@ import React from "react";
 import { AbsoluteFill, Audio, Easing, Img, interpolate, Sequence, spring, staticFile, useCurrentFrame } from "remotion";
 import type { CalculateMetadataFunction } from "remotion";
 import { z } from "zod";
-import { FONTS } from "./lib/fonts";
-import { Words, WHITE_SHADOW } from "./lib/words";
-import { CITY, COUNTRIES } from "./lib/worldmap";
-import { SfxTrack } from "./lib/sfx";
-import { CAL, FPS, MAP, MIX_DURS, T, TL, fr } from "./lib/mixtimes";
-import { cuesFor } from "./lib/mixcues";
+import { FONTS } from "../../lib/fonts";
+import { Words, WHITE_SHADOW } from "../../lib/words";
+import { CITY, COUNTRIES } from "./worldmap";
+import { SfxTrack } from "../../lib/sfx";
+import { CAL, FPS, MAP, MIX_DURS, T, TL, fr } from "./mixtimes";
+import { cuesFor } from "./mixcues";
+import { SafeZones } from "../../lib/safezones";
 import { B6, B9, Card, Media, Sub, Swoosh, founderSchema, words } from "./FounderIntro";
 
 export { CAL, MIX_DURS };
@@ -435,7 +436,7 @@ const OpenDay: React.FC<{ frames: number }> = ({ frames }) => {
       {/* small CODE brand mark (inverted to white, drop-shadowed). v8: moved from beside the (now much wider) caption to
           just below it — the two never share the frame with "I talked to" either way, since this mark is gone (durationInFrames
           = c.card) well before that line appears, so there's no three-way clash. */}
-      <Sequence from={0} durationInFrames={c.card} layout="none" name="CODE logo mark">
+      <Sequence  durationInFrames={c.card} layout="none" name="CODE logo mark">
         <AbsoluteFill style={{ pointerEvents: "none" }}>
           <Img
             src={staticFile(M("code_logo.png"))}
@@ -815,16 +816,5 @@ export const FounderMix: React.FC<MixProps> = (props) => {
     </AbsoluteFill>
   );
 };
-
-/** Areas covered by TikTok / Instagram Reels UI (union of both apps): top bar, right action column, bottom caption.
- *  v14: tightened to Juan's measured reference (1080×1920 canvas) — top 220px, right column 100px + 35px gap (so the
- *  safe area's right edge sits at 945px), bottom 450px. Previously 7% / 15% / 20%, which was looser on top and bottom. */
-export const SafeZones: React.FC = () => (
-  <AbsoluteFill style={{ pointerEvents: "none" }}>
-    <div style={{ position: "absolute", left: 0, right: 0, top: 0, height: 220, background: "rgba(255,0,0,0.28)" }} />
-    <div style={{ position: "absolute", right: 0, width: 135, top: "45%", bottom: "20%", background: "rgba(255,0,0,0.28)" }} />
-    <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 450, background: "rgba(255,0,0,0.28)" }} />
-  </AbsoluteFill>
-);
 
 export const mixDefaults: MP = mixSchema.parse({});

@@ -1,7 +1,18 @@
 #!/usr/bin/env python3
-"""Original instrumental bed for the MantAI founder reel (no samples, all synthesized -> no copyright).
-120 BPM, A minor (Am-F-C-G), grid aligned so a downbeat lands on the climax ('MantAI').
-usage: compose.py out.wav total_s climax_s build_start_s works_s outro_s"""
+"""Original instrumental music bed, synthesized from scratch (no samples, so no copyright questions).
+120 BPM, A minor (Am-F-C-G). The bar grid is aligned so a downbeat lands exactly on the climax.
+Sections: pad intro -> half-time verse (from 6.9 s) -> four-on-the-floor build with a riser -> 0.5 s of silence
+-> drop on the climax -> soft outro.
+
+usage: python3 tools/music_bed.py out.wav total_s climax_s build_start_s works_s outro_s
+  total_s        length of the video
+  climax_s       time of the climax cut (the downbeat + drum + crash land here)
+  build_start_s  where the build (kick, snare, 16th hats, riser) starts
+  works_s        a second accent (soft crash), e.g. a payoff line after the climax
+  outro_s        where the drop ends and the outro starts
+Example (the founder reel): python3 tools/music_bed.py bed.wav 37.75 27.83 21.35 32.98 34.6
+Check the energy curve afterwards (RMS per second): the build must be louder than the verse.
+Details: docs/sound-and-music.md"""
 import sys, numpy as np
 from scipy.signal import butter, sosfilt, fftconvolve
 import scipy.io.wavfile as wf

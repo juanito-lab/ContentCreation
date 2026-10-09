@@ -1,23 +1,38 @@
 #!/usr/bin/env python3
-"""Voice assembler: clean + level a raw take, optionally speed it up, keep only the given chunks
-(in script order), cap the pauses, add stutters. Writes the VO wav and a plan json with a time map.
-usage: assemble3.py raw.wav out.wav plan.json lines.json [tempo] [maxgap] [tail]
-lines.json: list of lines; each line = list of chunks [start,end] (source seconds), or
-            {"stutter":[start,end], "n":2, "gap":0.05} to repeat a short slice before the next chunk."""
-import json, subprocess, sys
+"""Voice assembler: clean and level a raw take, optionally speed it up, keep only the given chunks
+(in script order), cap the pauses between them, add stutters. Writes the voiceover wav and a plan json
+with a time map (source time -> new time) that you use to time the video.
+
+usage: python3 tools/voice_assemble.py raw.wav out.wav plan.json lines.json [tempo] [maxgap] [tail]
+  tempo   speed factor, same pitch (1.08 = 8% faster)                      default 1.0
+  maxgap  longest pause kept between chunks of one line, seconds           default 0.3
+  tail    silence after each line, seconds                                 default 0.28
+
+lines.json: one entry per script line; each entry is a list of chunks [start, end] in source seconds, or
+            {"stutter": [start, end], "n": 2, "gap": 0.05} to repeat a short slice before the next chunk.
+            The ".lines.json" file that voice-coach downloads per take is exactly this list. The full
+            voice-coach timing .json (an object with a "chunks" key) is accepted too.
+Chain: highpass 80 Hz, lowpass 15 kHz, noise reduction (afftdn), de-esser, compressor 2.5:1, [atempo], loudnorm -16 LUFS / -1.5 dBTP.
+Details: docs/voiceover.md"""
+import json, os, subprocess, sys, tempfile
 src, out, plan_out, lines_file = sys.argv[1:5]
 TEMPO = float(sys.argv[5]) if len(sys.argv) > 5 else 1.0
 MAXGAP = float(sys.argv[6]) if len(sys.argv) > 6 else 0.3
 TAIL = float(sys.argv[7]) if len(sys.argv) > 7 else 0.28
 PRE, POST = 0.06, 0.12
 LINES = json.load(open(lines_file))
+if isinstance(LINES, dict):  # full voice-coach timing file
+    LINES = LINES["chunks"]
+CLEAN = os.path.join(tempfile.mkdtemp(), "clean.wav")
 chain = "highpass=f=80,lowpass=f=15000,afftdn=nf=-50:nr=10,deesser=i=0.35,acompressor=threshold=-22dB:ratio=2.5:attack=10:release=150:makeup=1.5"
 if TEMPO != 1.0: chain += f",atempo={TEMPO}"
 chain += ",loudnorm=I=-16:TP=-1.5:LRA=7"
-subprocess.run(["ffmpeg","-v","error","-y","-i",src,"-af",chain,"-ac","1","-ar","48000","/tmp/clean_v.wav"],check=True)
+subprocess.run(["ffmpeg","-v","error","-y","-i",src,"-af",chain,"-ac","1","-ar","48000",CLEAN],check=True)
 sc = lambda x: x / TEMPO
 pieces=[]; t=0.0; lines=[]; cmap=[]
 for chunks in LINES:
+    if not chunks:  # a line the take never reached: keep its slot in the plan, add no audio
+        lines.append({"start":round(t,3),"len":0,"chunks":[]}); continue
     ls=t; offs=[]; prev_end=None
     for c in chunks:
         if isinstance(c, dict):
@@ -34,6 +49,6 @@ for i,(a,b,at,stut) in enumerate(pieces):
     ms=int(round(at*1000)); fo=0.015 if stut else 0.04
     filt.append(f"[0]atrim={a:.3f}:{b:.3f},asetpts=PTS-STARTPTS,afade=t=in:d=0.01,afade=t=out:st={max(0,b-a-fo):.3f}:d={fo},adelay={ms}|{ms}[p{i}]")
 filt.append("".join(f"[p{i}]" for i in range(len(pieces)))+f"amix=inputs={len(pieces)}:normalize=0,apad,atrim=0:{total+0.4:.3f}[o]")
-subprocess.run(["ffmpeg","-v","error","-y","-i","/tmp/clean_v.wav","-filter_complex",";".join(filt),"-map","[o]","-ar","48000","-ac","1",out],check=True)
+subprocess.run(["ffmpeg","-v","error","-y","-i",CLEAN,"-filter_complex",";".join(filt),"-map","[o]","-ar","48000","-ac","1",out],check=True)
 json.dump({"tempo":TEMPO,"total":round(total,3),"lines":lines,"map":cmap},open(plan_out,"w"),indent=1)
 print("total",round(total,2))

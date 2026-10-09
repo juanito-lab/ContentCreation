@@ -1,4 +1,7 @@
-# personal media never goes in this public repo
+# ---- your media never goes into the repo (it is public) ----
+library/*
+!library/README.md
+!library/LIBRARY.template.md
 studio/public/mix/
 studio/public/v/
 studio/public/vo/
@@ -7,9 +10,23 @@ videos/*/out/
 videos/*/*.wav
 videos/*/*.webm
 videos/*/*.mp4
+videos/*/*.mov
+videos/*/*.jpg
+videos/*/*.jpeg
+videos/*/*.png
+videos/*/*.heic
 refs/
-# build stuff
+
+# ---- secrets and personal settings ----
+.env
+.env.*
+!.env.example
+posting.json
+
+# ---- build output ----
 studio/node_modules/
 studio/out/
 studio/build/
+__pycache__/
+*.pyc
 .DS_Store

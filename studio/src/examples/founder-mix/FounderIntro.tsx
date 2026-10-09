@@ -15,11 +15,11 @@ import React from "react";
 import { AbsoluteFill, Audio, Easing, Img, interpolate, OffthreadVideo, Sequence, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import type { CalculateMetadataFunction } from "remotion";
 import { z } from "zod";
-import { FONTS } from "./lib/fonts";
-import { Words, WHITE_SHADOW } from "./lib/words";
-import type { Word } from "./lib/words";
-import { SfxTrack } from "./lib/sfx";
-import type { Cue, SoundName } from "./lib/sfx";
+import { FONTS } from "../../lib/fonts";
+import { Words, WHITE_SHADOW } from "../../lib/words";
+import type { Word } from "../../lib/words";
+import { SfxTrack } from "../../lib/sfx";
+import type { Cue, SoundName } from "../../lib/sfx";
 
 const FPS = 30;
 const fr = (s: number) => Math.round(s * FPS);

@@ -1,6 +1,6 @@
 // Sound cues of the FounderMix reel (v6). Every cue sits on a visual event of its beat (frame numbers come from mixtimes.ts, the same
 // numbers the animations use) and sounds that carry on after their visual (whooshes, pen strokes, page flips, plane) are cut with `until`.
-import type { Cue, SoundName } from "./sfx";
+import type { Cue, SoundName } from "../../lib/sfx";
 import { CAL, MAP, T, TL, fr, pf } from "./mixtimes";
 
 /** Cue plus the visual event it belongs to (for the cue table: tools/cuetable). */

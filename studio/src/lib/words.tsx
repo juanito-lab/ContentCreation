@@ -1,5 +1,6 @@
-// Wort-DSL: jedes Wort hat Schrift, Größe, Position (% der Fläche) und einen Einsatz-Frame.
-// v7: Wörter erscheinen hart auf einem Frame und stehen still (keine Animation).
+// Word layer: every word has a font, a size, a position (% of the frame) and the frame it appears on.
+// Words appear with a hard cut on their frame and then stand still (no pop or tilt animation; changed in founder-mix v7
+// because static text read better on fast footage).
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { z } from "zod";
@@ -54,7 +55,7 @@ const WordItem: React.FC<{ w: Word; color: string; shadow?: string }> = ({ w, co
   );
 };
 
-/** Absolut platzierte Wörter. `shadow` z. B. für weiße Wörter über Video. */
+/** Absolutely positioned words. `shadow`, for example, for white words over video. */
 export const Words: React.FC<{ words: Word[]; color?: string; shadow?: string }> = ({ words, color = "#000", shadow }) => (
   <AbsoluteFill style={{ pointerEvents: "none" }}>
     {words.map((w, i) => (
@@ -65,5 +66,5 @@ export const Words: React.FC<{ words: Word[]; color?: string; shadow?: string }>
 
 export const WHITE_SHADOW = "0 2px 18px rgba(0,0,0,0.45), 0 0 2px rgba(0,0,0,0.6)";
 
-/** Hilfe: Frames aus Sekunden bei 30 fps. */
+/** Helper: seconds → frames at 30 fps. */
 export const s = (sec: number) => Math.round(sec * 30);

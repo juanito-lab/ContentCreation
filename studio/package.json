@@ -1,7 +1,7 @@
 {
-  "name": "shortform-edit-kit-beispiel",
+  "name": "contentcreation-studio",
   "version": "1.0.0",
-  "description": "Kleines Remotion-Beispiel: Wort-Timing, Sound-Cues, Inset-Clips und ein gezeichneter Pfeil",
+  "description": "Remotion studio for spec-driven short vertical videos (TikTok / Instagram Reels): word timing, automatic sound design, safe zones",
   "license": "MIT",
   "private": true,
   "dependencies": {
@@ -25,7 +25,7 @@
   "scripts": {
     "dev": "remotion studio",
     "build": "remotion bundle",
-    "render": "remotion render Demo out/demo.mp4",
+    "render": "remotion render Short out/short.mp4",
     "lint": "eslint src && tsc"
   }
 }
