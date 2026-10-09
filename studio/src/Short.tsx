@@ -34,7 +34,7 @@ const wordSpec = z.object({
   /** centre position in % of width / height */
   x: z.number().default(50),
   y: z.number().default(20),
-  /** "" = theme ink (or white over full-bleed video) */
+  /** "" = theme accent for script words, theme ink (white over full-bleed video) for the rest */
   color: z.string().default(""),
   /** 0 = font default */
   weight: z.number().default(0),
@@ -224,7 +224,8 @@ const SceneView: React.FC<{ s: Scene; spec: Spec; frames: number }> = ({ s, spec
     size: w.size,
     x: w.x,
     y: w.y,
-    color: w.color || undefined,
+    // script words default to the theme accent (one red emotional word per beat), everything else to ink / white
+    color: w.color || (w.font === "script" ? spec.theme.accent : undefined),
     weight: w.weight || undefined,
     rotate: w.rotate || undefined,
     stroke: w.stroke || undefined,

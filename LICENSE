@@ -31,3 +31,5 @@ Third-party material in this repository keeps its own licence:
   shortform-edit-kit (https://github.com/JasperKallfelz/shortform-edit-kit),
   which has not published a licence yet. Ask him before reusing those files
   outside this project.
+- docs/research.md is an English summary of research notes compiled for the
+  same kit.

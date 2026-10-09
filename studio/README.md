@@ -1,48 +1,40 @@
-# Beispiel: Kurzvideo mit Wort-Timing und Sound-Cues
+# studio/ (Remotion project)
 
-Ein kleines Remotion-Projekt (9 s, 1080×1920, 30 fps, Composition `Demo`), das die Bausteine eines Kurzvideos zeigt, ohne eigenen Inhalt. Das fertige Beispiel liegt als `demo.mp4` daneben; dort sind die Effekte zum Anhören 14 dB lauter als im Projekt, wo sie unter Stimme und Musik liegen.
+The video renderer. You rarely need to touch it: `tools/make.sh` renders specs with it. Open it when you want to see a spec live or add a feature.
 
-## Was die Demo zeigt
-
-1. **Hook** (0–3 s): ein leeres Inset („your clip“) mit langsamem Zoom, drei Textzeilen, die wortgenau einpoppen, das rote Schreibschrift-Wort liegt leicht über dem Inset. Dazu Auslöser, Tastenanschläge und ein Bleistiftstrich.
-2. **Zahl** (3–6 s): eine grüne Zahl, die bis zum Schnitt immer weiter steigt, mit einer Klappe der Flughafen-Tafel alle 3 Frames (wird lauter), vorneweg eine umgeblätterte Seite und am Ende ein Riser, der genau auf dem Schnitt endet.
-3. **Schluss** (6–9 s): Name über einem zweiten Inset, ein Kringel-Pfeil, der sich vom Namen in den Clip zeichnet, eine Textzeile darunter. Trommel auf dem Schnitt.
-
-Alle Zeiten stehen an einer Stelle: `src/timing.ts` (Wortzeiten in ms, so wie eine Sprachaufnahme sie nach der Wort-Ausrichtung liefert). Szenen, Texte und Sounds hängen an denselben Konstanten, ändert man eine Zeit, wandern Bild und Ton zusammen. In einem echten Projekt wird diese Datei aus dem Voiceover erzeugt.
-
-| Datei | Inhalt |
-| --- | --- |
-| `src/timing.ts` | Wortzeiten und Videolänge |
-| `src/Demo.tsx` | Szenen, `Inset`, Zahl, Kringel-Pfeil, Props-Schema und `SFX_CUES` |
-| `src/lib/words.tsx` | Wort-DSL: Schrift, Größe, Position und Einsatz-Frame je Wort |
-| `src/lib/fonts.ts` | Schriften über `@remotion/google-fonts` |
-| `src/lib/sfx.tsx` | Katalog `SOUNDS` und die Spur `SfxTrack`, die eine Cue-Liste abspielt |
-| `public/sfx/` | 51 aufbereitete Sounds (48 kHz, normalisiert) |
-
-## Starten
-
-```
-npm install
-npm run dev
+```bash
+npm run dev        # Remotion Studio on http://localhost:3000
+npm run lint       # ESLint + TypeScript
 ```
 
-Das öffnet das Remotion Studio. Dort die Composition `Demo` wählen. Jeder Sound steht in der Zeitleiste als „SFX · Name“.
+## Compositions
 
-## Eigenen Clip, Voiceover und Musik einsetzen
+| Id | File | What it is |
+|---|---|---|
+| **Short** | `src/Short.tsx` | **The main one.** A vertical video built from a JSON spec (scenes, words, media, counters, climax) with automatic sound design. `tools/make.sh` renders this. Every field: [docs/spec-reference.md](../docs/spec-reference.md). |
+| Demo | `src/examples/demo/` | A 9 s hand-coded reference edit (hook, rising number, squiggle outro) from Jasper Kallfelz's shortform-edit-kit. Times come from `timing.ts`. No media needed. |
+| FounderMix | `src/examples/founder-mix/FounderMix.tsx` | Case study: the 12-beat MantAI founder reel. Needs personal media in `public/mix/` and `public/vo/` (git-ignored). |
+| FounderIntro | `src/examples/founder-mix/FounderIntro.tsx` | Case study: its first draft; FounderMix reuses its beats (avatar grid, photo wall, alert card, squiggle). |
 
-Dateien in den Ordner `public/` legen, dann im Studio rechts im Props-Feld auswählen:
+## Shared code (`src/lib/`)
 
-- **Clip:** `slots` → Eintrag 1 ist das Inset im Hook, Eintrag 2 das im Schluss. Bei `clip` den Dateinamen eintragen (z. B. `mein-clip.mp4`), mit `startSec` die Startstelle im Clip wählen. Leer bleibt der graue Platzhalter.
-- **Voiceover:** bei `voiceover` den Dateinamen eintragen. Die Schnitte gehören zu den Wortzeiten in `src/timing.ts`; für eine andere Aufnahme die Zeiten dort anpassen.
-- **Musik:** bei `music` den Dateinamen eintragen, `musicVolume` regelt die Lautstärke. Leer = keine Musik.
-- `sfxVolume` regelt alle Effekte zusammen (Standard 1.3), `counterTo` den Wert, den die Zahl beim Schnitt erreicht.
+| File | What it does |
+|---|---|
+| `fonts.ts` | Loads the three bundled faces (Inter Tight, Libre Caslon Display, Great Vibes) from `public/fonts` |
+| `words.tsx` | The word layer: each word has a font, size, position (% of the frame) and the frame it cuts in on |
+| `sfx.tsx` | The sound catalogue (`SOUNDS`: file, length, lead, loudness) and `SfxTrack`, which plays a list of cues as named sequences |
+| `safezones.tsx` | The red overlay of the areas TikTok / Reels cover with their UI |
 
-## Rendern
+## Assets (`public/`)
 
-```
-npx remotion render Demo out/demo.mp4
-```
+| Folder | Contents |
+|---|---|
+| `sfx/` | 61 real recorded sound effects, trimmed and measured; sources and licences in `sfx/CREDITS.md` |
+| `fonts/` | the three faces as woff2 (SIL Open Font License) |
+| `music/` | an original synthesized music bed (`tools/music_bed.py`) |
+| `v/<id>/` | created by `make.sh` for each render (git-ignored) |
+| `mix/`, `vo/` | personal media for the case study (git-ignored) |
 
-## Sounds
+## Adding a beat type to Short
 
-Die Sounds in `public/sfx` sind CC0 bzw. CC0-ähnlich (BigSoundBank „CC0 1.0 / WTFPL“, Freesound-CC0, Remotion-SFX, Kenney). Herkunft und Lizenz je Datei stehen in `../sfx-kit/quellen.tsv`.
+Add an optional field to `sceneSpec` (zod, with defaults for every string), render it in `SceneView`, give it sound cues in `buildCues`, then document it in `docs/spec-reference.md`. Port visuals from `src/examples/founder-mix/` rather than writing a new composition per video.

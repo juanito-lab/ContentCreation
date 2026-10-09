@@ -55,7 +55,7 @@ this repo took 11.5 hours; the rules below are what cut that.
    safe zones in red, plus `preview-sheet.jpg`. Look at every still yourself: text inside the safe area, nothing
    overlapping, readable over footage, no empty or black frame. Fix, re-preview, then send the sheet + hook to the creator.
 6. **Render.** `tools/make.sh videos/<id>` → `out/<id>_1080x1920.mp4` (+ `_no-music.mp4` when the spec has music),
-   `cover-*.png`, `caption.txt`, `render.json`. About 1 minute per 10 s of video on a laptop.
+   `cover-*.png`, `caption.txt`, `render.json`. About 1 minute of rendering per 10 s of video.
 7. **QA + approval.** If a QA reviewer agent exists, post the mp4, cover and caption to it first. Then send the creator
    the video, the cover and the exact caption. **Nothing is posted until the creator says "yes" to that exact file and
    caption.** Posting: the `post-video` skill.
