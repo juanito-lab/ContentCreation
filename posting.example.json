@@ -1,0 +1,18 @@
+{
+  "_comment": "Copy to posting.json (git-ignored). Every field is optional; these are the defaults. Docs: docs/posting.md",
+  "timezone": "Europe/Berlin",
+  "accounts": {
+    "instagram": "",
+    "tiktok": ""
+  },
+  "tiktok": {
+    "privacy_level": "PUBLIC_TO_EVERYONE",
+    "allow_comment": true,
+    "allow_duet": false,
+    "allow_stitch": true,
+    "video_made_with_ai": false
+  },
+  "instagram": {
+    "shareToFeed": true
+  }
+}
