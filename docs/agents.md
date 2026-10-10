@@ -53,6 +53,24 @@ These came from running editing, animation, sound and research as separate agent
 - **Agents can't listen.** Any change to sound needs a human ear before posting. Ask for the cue list instead and check the numbers.
 - **One step, one line.** Ask for a one-line report per step and a final "made / checked / open".
 
+## Talking to the agent instead of typing
+
+Most of a video's input is spoken anyway: the brief, the script beats, the notes after watching the stills. Dictating them into the agent's chat box is faster than typing, and it keeps the brief in your own words.
+
+[Handy](https://github.com/cjpais/Handy) is a free, open-source dictation app (MIT) that runs speech-to-text locally (Whisper or Parakeet models). No account, no usage limit, and after the first model download it works offline. Press a hotkey, talk, release: the text is typed into whatever has focus, including Claude Code, the Claude app or a terminal.
+
+Setup on macOS:
+
+1. Download the `.dmg` (Apple Silicon: `aarch64`) from the [releases page](https://github.com/cjpais/Handy/releases), move Handy to Applications, open it.
+2. Allow **Microphone** and **Accessibility** when asked (Accessibility is what lets it type into other apps). Pick a model; Parakeet is fast on Apple Silicon.
+3. Set the **Transcribe** shortcut in Handy's settings. The default on macOS is `Option+Space`.
+   - To use a single function key such as **F5**: on Mac keyboards F5 is the system dictation key, so either turn on *System Settings → Keyboard → Keyboard Shortcuts → Function Keys → "Use F1, F2, etc. keys as standard function keys"*, or press `fn+F5` when setting and using the shortcut.
+
+Two habits that keep dictated briefs usable:
+
+- **Say the numbers.** "Hook under two point five seconds, voice volume zero point six" survives transcription; "make it punchier" gives the agent nothing to check.
+- **Read it before you send it.** Speech-to-text gets names and file names wrong (`spec.json`, `vo.wav`, handles). Fix those by hand, then send.
+
 ## Approval is not optional
 
 The skills, `post.py` and this page all say the same thing, on purpose:

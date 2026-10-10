@@ -15,7 +15,7 @@ Then look things up as you need them:
 | [look-and-safe-zones.md](look-and-safe-zones.md) | where text may go on TikTok and Reels, type, colour, pace, cards, covers |
 | [media.md](media.md) | the media library, contact sheets, preparing phone footage, references |
 | [posting.md](posting.md) | Zernio setup, the approval lock, publish / schedule / draft, limits, errors |
-| [agents.md](agents.md) | running all of this with Claude Code or Hermes, and briefing agents well |
+| [agents.md](agents.md) | running all of this with Claude Code or Hermes, briefing agents well, and dictating to them with Handy |
 | [tools.md](tools.md) | every command with its options |
 | [research.md](research.md) | what studies and platform docs say about retention, captions, hashtags, music, testing |
 | [case-study-founder-mix.md](case-study-founder-mix.md) | the first real video: where 11.5 hours went and the rule each mistake produced |

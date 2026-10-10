@@ -124,7 +124,7 @@ Your media never goes into git: `library/`, `refs/`, render output and media fil
 | [Look and safe zones](docs/look-and-safe-zones.md) | where text may go, type, colour, pace, covers |
 | [Media](docs/media.md) | library, contact sheets, phone footage, references |
 | [Posting](docs/posting.md) | Zernio setup, approval, publish / schedule / draft |
-| [Agents](docs/agents.md) | Claude Code, Hermes, briefing agents |
+| [Agents](docs/agents.md) | Claude Code, Hermes, briefing agents, dictating briefs with Handy |
 | [Tools](docs/tools.md) | every command and option |
 | [Research](docs/research.md) | what studies and platform docs say about retention, hashtags, music, testing |
 | [Case study](docs/case-study-founder-mix.md) | the first real video, its mistakes and the rules they produced |
