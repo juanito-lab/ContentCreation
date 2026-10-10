@@ -125,6 +125,11 @@ class SpecCheckTests(unittest.TestCase):
         })
         self.assertTrue(any("bottom" in w for w in warnings))
 
+    def test_text_duration_is_an_error_not_a_crash(self):
+        errors, _, info = self.check({"scenes": [{"dur": "2"}, {"dur": 3}]})
+        self.assertTrue(any('"dur"' in e for e in errors))
+        self.assertEqual(info["frames"], 90)
+
     def test_two_climaxes_is_an_error(self):
         errors, _, _ = self.check({"scenes": [{"dur": 2, "climax": True}, {"dur": 2, "climax": True}]})
         self.assertTrue(any("climax" in e for e in errors))

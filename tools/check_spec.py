@@ -77,6 +77,7 @@ def check(video_dir: Path) -> tuple[list[str], list[str], dict]:
     if not scenes:
         errors.append('"scenes" is empty')
     total = 0.0
+    frames = 0
     climaxes = 0
     for i, s in enumerate(scenes, 1):
         label = f'scene {i} "{s.get("name", "")}"'.replace(' ""', "")
@@ -85,6 +86,7 @@ def check(video_dir: Path) -> tuple[list[str], list[str], dict]:
             errors.append(f'{label}: "dur" must be a positive number of seconds')
             continue
         total += dur
+        frames += round(dur * 30)
         climaxes += bool(s.get("climax"))
         media = s.get("media")
         if media:
@@ -141,7 +143,7 @@ def check(video_dir: Path) -> tuple[list[str], list[str], dict]:
     if not caption:
         warnings.append('no "post.caption" set; caption.txt will be empty')
 
-    return errors, warnings, {"scenes": len(scenes), "seconds": round(total, 2), "frames": sum(round(s.get("dur", 0) * 30) for s in scenes)}
+    return errors, warnings, {"scenes": len(scenes), "seconds": round(total, 2), "frames": frames}
 
 
 def main() -> int:
