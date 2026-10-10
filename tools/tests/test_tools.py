@@ -134,6 +134,13 @@ class SpecCheckTests(unittest.TestCase):
         errors, _, _ = self.check({"scenes": [{"dur": 2, "climax": True}, {"dur": 2, "climax": True}]})
         self.assertTrue(any("climax" in e for e in errors))
 
+    def test_hashtags_in_caption_count_too(self):
+        _, warnings, _ = self.check({"scenes": [{"dur": 4}],
+                                     "post": {"caption": "made this #fyp #a #b?", "hashtags": ["c", "d", "e"]}})
+        text = " ".join(warnings)
+        self.assertIn("6 hashtags", text)
+        self.assertIn("#fyp", text)
+
     def test_hashtag_rules(self):
         _, warnings, _ = self.check({"scenes": [{"dur": 4}],
                                      "post": {"caption": "no question", "hashtags": ["fyp", "a", "b", "c", "d", "e"]}})

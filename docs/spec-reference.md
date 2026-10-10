@@ -21,7 +21,7 @@ One JSON file describes one video. `tools/make.sh` renders it with the `Short` c
 | `theme.accent2` | colour | `#12b76a` | Default colour of counters. |
 | `covers` | array of frames | 3 frames: start, middle, end | Frames exported as `cover-<frame>.png`. The **first** one is also the cover frame when posting. |
 | `post.caption` | string | `""` | Caption text. Written to `out/caption.txt` and posted exactly as written. |
-| `post.hashtags` | array of strings | `[]` | Appended after a blank line as `#tag` (with or without the `#`). Max 5 for Instagram. |
+| `post.hashtags` | array of strings | `[]` | Appended after a blank line as `#tag` (with or without the `#`). Max 5 for Instagram, counting any `#tags` typed into `post.caption`; `check_spec.py` warns above that. |
 | `safeZones` | bool | `false` | Draw the app-UI areas in red. `make.sh --preview` turns it on; never set it for a real render. |
 
 ## Scene
