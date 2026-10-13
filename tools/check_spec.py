@@ -12,7 +12,7 @@ Warnings (the render works, but the post will suffer):
   - a word whose box probably reaches into the TikTok / Reels UI areas (see docs/look-and-safe-zones.md)
   - total length under 3 s or over 90 s (Instagram Reels via the API: 3-90 s)
   - voiceover shorter or longer than the scenes by more than 0.5 s
-  - more than 5 hashtags in the list and the caption together (Instagram's limit), #fyp / #viral, a caption without a question
+  - more than 5 hashtags in the list and the caption together (Instagram's limit), #fyp / #viral
 The text-box check is an estimate from font size and character count. The preview stills with safe zones
 (tools/make.sh videos/<id> --preview) are the real check.
 """
@@ -140,8 +140,6 @@ def check(video_dir: Path) -> tuple[list[str], list[str], dict]:
     bad = sorted(set(tags) & BANNED_TAGS)
     if bad:
         warnings.append(f"drop {', '.join('#' + b for b in bad)}: there is no evidence they help")
-    if caption and "?" not in caption:
-        warnings.append("caption has no question; ending on a question invites comments")
     if not caption:
         warnings.append('no "post.caption" set; caption.txt will be empty')
 

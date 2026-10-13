@@ -1,7 +1,7 @@
 ---
 name: shortform-video
 description: "Make a short vertical video (TikTok / Instagram Reels) with the ContentCreation repo: turn a reference reel, related content, clips or an idea into a script and a JSON spec, time it to the creator's recorded voice, check preview stills against the platform safe zones, render with Remotion (automatic sound design, -14 LUFS, covers, caption) and get the creator's approval. Use when the creator sends a reference link, clips or a topic, or says 'make a video / reel / tiktok'."
-version: 3.0.0
+version: 3.1.0
 platforms: [linux, macos]
 metadata:
   hermes:
@@ -40,7 +40,7 @@ this repo took 11.5 hours; the rules below are what cut that.
    - Write down the reference's structure: hook (first 1.5 s), number of scenes, cut rhythm, where text sits, the climax.
 2. **Script + caption.** Same structure and pacing, the creator's own story and numbers. One line per beat, ~3 words per
    second (~40 words per 15 s). Every line carries a number or a mechanism. Strongest image and line first. Caption
-   ends with a question, 3–5 specific hashtags. Send hook + lines + caption and wait for "ok".
+   ending as the brief says (not always a question), 3–5 specific hashtags. Send hook + lines + caption and wait for "ok".
 3. **Voice.** The creator records the approved script in voice-coach and downloads the best take's `.wav` and
    `.lines.json`. Then:
    ```bash
@@ -60,6 +60,20 @@ this repo took 11.5 hours; the rules below are what cut that.
    the video, the cover and the exact caption. **Nothing is posted until the creator says "yes" to that exact file and
    caption.** Posting: the `post-video` skill.
 
+## Batch mode (a week of videos)
+
+When the creator (or a content-strategy agent) sends a batch of briefs, follow `docs/batches-and-funnel.md`:
+- Build **all** of them (2× the posts); the creator picks. Each brief fixes its funnel stage (reach / update / depth) and its
+  style: writing, delivery, edit, camera, text treatment, setting, hook, length, music energy, caption ending. **Build exactly
+  that style.** Don't drift back to the house look (`script` accent word) — it's allowed in at most 2 of 14. If `Short` has no
+  scene for a text look yet, add it once as a reusable option.
+- Footage: only the clips the brief lists, never clips from earlier videos, never one clip in two videos of the batch.
+  Check every person on screen against the cast allow-list in `CREATOR.md`.
+- Output: one folder per batch, one subfolder per video (`<NN>_<stage>_<slug>/`: mp4, cover, caption), plus `CALENDAR.md`
+  with one suggested video per day by the funnel calendar (never the same stage two days in a row) and a runner-up.
+- Before handing over, line the videos up in calendar order and check neighbours: two back-to-back posts must not share
+  writing style, edit style, camera, text treatment or setting.
+
 ## Spec in one screen
 
 ```jsonc
@@ -77,7 +91,7 @@ this repo took 11.5 hours; the rules below are what cut that.
     { "name": "Payoff", "dur": 3.5, "climax": true, "words": [ ... ] }
   ],
   "covers": [20, 150],
-  "post": { "caption": "... ending on a question?", "hashtags": ["buildinpublic", "startup"] }
+  "post": { "caption": "... ending as the brief says", "hashtags": ["buildinpublic", "startup"] }
 }
 ```
 
@@ -92,3 +106,5 @@ Every field: `docs/spec-reference.md`.
 - Use another creator's footage, audio, handle or watermark. Their reel is a reference only.
 - Post, schedule or upload anything without the creator's "yes" to the exact file and caption.
 - Report in paragraphs. One line per step; at the end: what was made, what was checked, what is open.
+- Put anyone on screen who isn't on the cast allow-list, or use generated visuals instead of real footage.
+- Reuse clips from earlier videos, or post the same kind of video two days in a row.

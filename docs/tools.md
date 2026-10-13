@@ -14,7 +14,7 @@ Every tool prints its usage with `-h` (Python) or without arguments (shell). Pat
 | Command | What it does |
 |---|---|
 | `tools/new_video.sh <id>` | Creates `videos/<id>/` with the template `spec.json`. Ids: lowercase, digits, dashes (e.g. `2026-10-12-first-pilot`). |
-| `python3 tools/check_spec.py videos/<id>` | Validates a spec: errors (missing files, no scenes, two climaxes) and warnings (text in UI areas, length outside 3–90 s, voice vs. scene length, hashtags, caption without a question). Exit 1 on errors. |
+| `python3 tools/check_spec.py videos/<id>` | Validates a spec: errors (missing files, no scenes, two climaxes) and warnings (text in UI areas, length outside 3–90 s, voice vs. scene length, hashtags). Exit 1 on errors. |
 | `tools/make.sh videos/<id> --preview` | Check + one still per scene (just after its last word appears) with safe zones, the cover frames, and `preview-sheet.jpg`. ~15 s. |
 | `tools/make.sh videos/<id>` | Check + full render: mp4 (−14 LUFS master), `_no-music.mp4` if the spec has music, `cover-*.png`, `caption.txt`, `render.json`. |
 | `tools/make.sh videos/<id> --no-check` | Skip the spec check. |

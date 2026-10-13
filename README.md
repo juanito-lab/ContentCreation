@@ -118,6 +118,7 @@ Your media never goes into git: `library/`, `refs/`, render output and media fil
 |---|---|
 | [Getting started](docs/getting-started.md) | install, the example, making it yours, your first video |
 | [Workflow](docs/workflow.md) | the whole process and the five rules behind it |
+| [Batches and the funnel](docs/batches-and-funnel.md) | a week of videos: 2× to choose from, reach / update / depth, no two alike, a different kind of video every day |
 | [Spec reference](docs/spec-reference.md) | every field, automatic sound design, sound names |
 | [Voiceover](docs/voiceover.md) | recording, picking a take, cleaning, timing, mix levels |
 | [Sound and music](docs/sound-and-music.md) | sound rules, adding sounds, music licensing, the music bed |
@@ -137,6 +138,8 @@ Your media never goes into git: `library/`, `refs/`, render output and media fil
 - **No personal media in the repo.** It's public; media lives in git-ignored folders.
 - **Facts only from the creator.** Agents never invent numbers, claims or names.
 - **Always keep a no-music version** when a video has music, so a sound can be added in the app.
+- **Make 2× what you post, and no two alike.** Every video differs in writing, edit, camera, text look and setting; back-to-back posts are different funnel stages ([batches and the funnel](docs/batches-and-funnel.md)).
+- **Fresh, real footage every video**, and only people on the creator's cast allow-list on screen.
 
 ## Roadmap
 

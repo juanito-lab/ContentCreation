@@ -4,6 +4,7 @@ Read in this order the first time:
 
 1. **[getting-started.md](getting-started.md)**: install, render the example, make the repo yours, your first video in 8 commands
 2. **[workflow.md](workflow.md)**: the whole process, from a reference reel to a posted video, and why each step is where it is
+3. **[batches-and-funnel.md](batches-and-funnel.md)**: the week: 2× videos to choose from, reach / update / depth, no two videos alike, a different kind of video every day
 
 Then look things up as you need them:
 

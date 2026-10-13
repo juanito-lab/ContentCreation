@@ -1,6 +1,8 @@
 # Workflow: from a reference reel to a posted video
 
-This is the fast path. It exists because the first video made with this repo took **11.5 hours** for 34 seconds, and almost all of that time went into five avoidable mistakes ([case study](case-study-founder-mix.md)). Follow the order below and a 30–40 s video takes **under 2 hours**, most of it your own recording time.
+This is the fast path for **one** video. For a week of them (2× to choose from, the funnel, a different kind of video every day) see [batches-and-funnel.md](batches-and-funnel.md).
+
+It exists because the first video made with this repo took **11.5 hours** for 34 seconds, and almost all of that time went into five avoidable mistakes ([case study](case-study-founder-mix.md)). Follow the order below and a 30–40 s video takes **under 2 hours**, most of it your own recording time.
 
 ```
  reference ─▶ script ─▶ VOICE ─▶ spec ─▶ preview stills ─▶ render ─▶ approval ─▶ post
